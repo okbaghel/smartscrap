@@ -1,14 +1,25 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import babelParser from "@babel/eslint-parser";
+import next from "eslint-plugin-next";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
-
-export default eslintConfig;
+export default [
+  js.configs.recommended, // Use ESLint's recommended JS settings
+  {
+    languageOptions: {
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ["@babel/preset-env", "@babel/preset-react"],
+        },
+      },
+    },
+    plugins: {
+      next, // Next.js recommended rules
+    },
+    rules: {
+      // Add custom rules here
+    },
+  },
+];
+ 
