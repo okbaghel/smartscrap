@@ -1,8 +1,12 @@
+export const runtime = "nodejs";
+
+
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import WasteTicket from "@/models/WasteTicket";
 import cloudinary from "@/lib/cloudinary";
 import { v4 as uuidv4 } from "uuid";
+
 
 export async function POST(req) {
   try {
@@ -15,20 +19,28 @@ export async function POST(req) {
     const lng = parseFloat(formData.get("lng"));
     const image = formData.get("image");
 
-    if (!userId || !weight || !lat || !lng || !image) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!userId || isNaN(weight) || isNaN(lat) || isNaN(lng) || !image) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    // Convert file to buffer for Cloudinary
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload image to Cloudinary
-    const uploadResponse = await cloudinary.uploader.upload(`data:image/jpeg;base64,${buffer.toString("base64")}`);
-    const ticketId = uuidv4().replace(/-/g, "").substring(0, 10).toUpperCase(); 
-    // console.log(ticketId);
+    const uploadResponse = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "waste_uploads" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
 
-    // Save ticket in MongoDB
+    const ticketId = uuidv4().replace(/-/g, "").substring(0, 10).toUpperCase();
+
     const newTicket = new WasteTicket({
       userId,
       imageUrl: uploadResponse.secure_url,
@@ -40,9 +52,12 @@ export async function POST(req) {
 
     await newTicket.save();
 
-    return NextResponse.json({ message: "Waste uploaded successfully", ticket: newTicket }, { status: 201 });
+    return NextResponse.json(
+      { message: "Waste uploaded successfully", ticket: newTicket },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Upload Waste Error:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

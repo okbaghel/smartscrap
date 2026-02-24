@@ -60,20 +60,12 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up-delay-2">
-              <SignUpButton mode="modal">
-                <Button 
-                  size="lg" 
-                  className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold px-8 py-6 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
-                >
-                  Get Started Free
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </SignUpButton>
+              
               <SignInButton mode="modal">
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-emerald-700 font-semibold px-8 py-6 text-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                  className="border-2 border-white text-emerald-700 hover:bg-white hover:text-emerald-700 font-semibold px-8 py-6 text-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"
                 >
                   Sign In
                 </Button>
